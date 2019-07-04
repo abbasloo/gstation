@@ -22,8 +22,13 @@ private slots:
     void makePlotMeasurement();
     void makePlotSystem();
     void readSerial();
+    void doCapture();
+    void on_action_file_save_as_triggered();
+    void on_action_edit_copy_triggered();
 
 private:
+    struct Private;
+    Private *pv;
     Ui::MainWindow *ui;
     QSerialPort *arduino;
     static const quint16 arduino_uno_vendor_id = 9025;
