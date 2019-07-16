@@ -70,7 +70,7 @@ public:
     void open()
     {
         close();
-        cap = cvCreateCameraCapture(0);
+        cap = cvCreateCameraCapture(1);
     }
     void close()
     {
@@ -106,8 +106,8 @@ public:
 };
 
 struct MainWindow::Private {
-    //Capture1 cap;
-    Capture2 cap;
+    Capture1 cap;
+    //Capture2 cap;
     QTimer timer;
 };
 

@@ -1,3 +1,7 @@
+//sudo usermod -a -G dialout lolo
+//udo chmod a+rw /dev/ttyACM0
+
+
 void setup() {
   // initialize serial:
   Serial.begin(9600);
@@ -8,7 +12,7 @@ void loop() {
       Serial.print(i);
       Serial.print(",");
       Serial.flush();
-      delay(1000);
+      delay(100);
    }
    delay(1000);
 }
