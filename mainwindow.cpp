@@ -7,6 +7,11 @@
 #include <QClipboard>
 #include "opencv2/opencv.hpp"
 #include <algorithm>
+#include <QtWebEngineWidgets/QWebEngineView>
+#include <QtWebEngineWidgets/QWebEnginePage>
+#include <QtWebEngineWidgets/QWebEngineSettings>
+
+
 
 #ifdef _WIN32
 #ifdef QT_NO_DEBUG
@@ -117,6 +122,12 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     pv = new Private();
     ui->setupUi(this);
+    //setFixedSize(2000, 800);
+
+    QWebEngineView* webview = new QWebEngineView;
+    QUrl url = QUrl("qrc:/map.html");
+    webview->page()->load(url);
+    ui->widget_3->addWidget(webview);
 
     pv->cap.open();
 
@@ -201,33 +212,33 @@ void MainWindow::makePlotMeasurement(){
     double miny = *std::min_element(y.constBegin(), y.constEnd());
     double maxy = *std::max_element(y.constBegin(), y.constEnd());
     // create graph and assign data to it:
-    ui->customplot_1->clearGraphs();
-    ui->customplot_1->addGraph(ui->customplot_1->yAxis, ui->customplot_1->xAxis);
-    ui->customplot_1->graph(0)->setPen(QColor(255, 0, 0, 255));
-    ui->customplot_1->graph(0)->setLineStyle(QCPGraph::lsNone);
-    ui->customplot_1->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
-    ui->customplot_1->graph(0)->setData(x, y);
+    ui->widget_2->clearGraphs();
+    ui->widget_2->addGraph(ui->widget_2->yAxis, ui->widget_2->xAxis);
+    ui->widget_2->graph(0)->setPen(QColor(255, 0, 0, 255));
+    ui->widget_2->graph(0)->setLineStyle(QCPGraph::lsNone);
+    ui->widget_2->graph(0)->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 4));
+    ui->widget_2->graph(0)->setData(x, y);
     // give the axes some labels:
-    ui->customplot_1->xAxis->setLabel("Mx");
-    ui->customplot_1->yAxis->setLabel("My");
+    ui->widget_2->xAxis->setLabel("Mx");
+    ui->widget_2->yAxis->setLabel("My");
     // set axes ranges, so we see all data:
-    ui->customplot_1->xAxis->setRange(minx, maxx);
-    ui->customplot_1->yAxis->setRange(miny, maxy);
-    QCPTextElement *title = new QCPTextElement(ui->customplot_1, "Measurment", QFont("sans", 10, QFont::Bold));
-    ui->customplot_1->plotLayout()->addElement(1, 0, title);
-    ui->customplot_1->replot();
+    ui->widget_2->xAxis->setRange(minx, maxx);
+    ui->widget_2->yAxis->setRange(miny, maxy);
+    QCPTextElement *title = new QCPTextElement(ui->widget_2, "Measurment", QFont("sans", 10, QFont::Bold));
+    ui->widget_2->plotLayout()->addElement(1, 0, title);
+    ui->widget_2->replot();
 }
 
 void MainWindow::makePlotSystem(){
 
-    ui->customplot_2->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
-    ui->customplot_2->legend->setVisible(true);
+    ui->widget_4->setLocale(QLocale(QLocale::English, QLocale::UnitedKingdom)); // period as decimal separator and comma as thousand separator
+    ui->widget_4->legend->setVisible(true);
     QFont legendFont = font();  // start out with MainWindow's font..
     legendFont.setPointSize(9); // and make a bit smaller for legend
-    ui->customplot_2->legend->setFont(legendFont);
-    ui->customplot_2->legend->setBrush(QBrush(QColor(255,255,255,230)));
+    ui->widget_4->legend->setFont(legendFont);
+    ui->widget_4->legend->setBrush(QBrush(QColor(255,255,255,230)));
     // by default, the legend is in the inset layout of the main axis rect. So this is how we access it to change legend placement:
-    ui->customplot_2->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignRight);
+    ui->widget_4->axisRect()->insetLayout()->setInsetAlignment(0, Qt::AlignBottom|Qt::AlignRight);
 
     // generate some data:
     QVector<double> x, y;
@@ -254,20 +265,20 @@ void MainWindow::makePlotSystem(){
     double min1 = *std::min_element(y.constBegin(), y.constEnd());
     double max1 = *std::max_element(y.constBegin(), y.constEnd());
     // create graph and assign data to it:
-    ui->customplot_2->clearGraphs();
-    ui->customplot_2->addGraph();
-    ui->customplot_2->graph(0)->setData(x, y);
-    ui->customplot_2->graph(0)->setPen(QPen(QColor(255, 0, 0)));
-    ui->customplot_2->graph(0)->setName("X");
+    ui->widget_4->clearGraphs();
+    ui->widget_4->addGraph();
+    ui->widget_4->graph(0)->setData(x, y);
+    ui->widget_4->graph(0)->setPen(QPen(QColor(255, 0, 0)));
+    ui->widget_4->graph(0)->setName("X");
     // give the axes some labels:
-    ui->customplot_2->xAxis->setLabel("t");
-    ui->customplot_2->yAxis->setLabel("P");
+    ui->widget_4->xAxis->setLabel("t");
+    ui->widget_4->yAxis->setLabel("P");
     // set axes ranges, so we see all data:
-    ui->customplot_2->xAxis->setRange(0, y.size());
-    //ui->customplot_2->yAxis->setRange(min1, max1);
-    QCPTextElement *title = new QCPTextElement(ui->customplot_2, "System Parameters", QFont("sans", 10, QFont::Bold));
-    ui->customplot_2->plotLayout()->addElement(1, 0, title);
-    ui->customplot_2->replot();
+    ui->widget_4->xAxis->setRange(0, y.size());
+    //ui->widget_4->yAxis->setRange(min1, max1);
+    QCPTextElement *title = new QCPTextElement(ui->widget_4, "System Parameters", QFont("sans", 10, QFont::Bold));
+    ui->widget_4->plotLayout()->addElement(1, 0, title);
+    ui->widget_4->replot();
 
     // generate some data:
     if (data.size() == 0){
@@ -291,19 +302,19 @@ void MainWindow::makePlotSystem(){
     double min2 = *std::min_element(y.constBegin(), y.constEnd());
     double max2 = *std::max_element(y.constBegin(), y.constEnd());
     // create graph and assign data to it:
-    ui->customplot_2->addGraph();
-    ui->customplot_2->graph(1)->setData(x, y);
-    ui->customplot_2->graph(1)->setPen(QPen(QColor(0, 255, 0)));
-    ui->customplot_2->graph(1)->setName("Y");
+    ui->widget_4->addGraph();
+    ui->widget_4->graph(1)->setData(x, y);
+    ui->widget_4->graph(1)->setPen(QPen(QColor(0, 255, 0)));
+    ui->widget_4->graph(1)->setName("Y");
     // give the axes some labels:
-    ui->customplot_2->xAxis->setLabel("t");
-    ui->customplot_2->yAxis->setLabel("P");
+    ui->widget_4->xAxis->setLabel("t");
+    ui->widget_4->yAxis->setLabel("P");
     // set axes ranges, so we see all data:
-    ui->customplot_2->xAxis->setRange(0, y.size());
-    //ui->customplot_2->yAxis->setRange(min2, max2);
-    title = new QCPTextElement(ui->customplot_2, "System Parameters", QFont("sans", 10, QFont::Bold));
-    ui->customplot_2->plotLayout()->addElement(1, 0, title);
-    ui->customplot_2->replot();
+    ui->widget_4->xAxis->setRange(0, y.size());
+    //ui->widget_4->yAxis->setRange(min2, max2);
+    title = new QCPTextElement(ui->widget_4, "System Parameters", QFont("sans", 10, QFont::Bold));
+    ui->widget_4->plotLayout()->addElement(1, 0, title);
+    ui->widget_4->replot();
 
     // generate some data:
     if (data.size() == 0){
@@ -327,20 +338,20 @@ void MainWindow::makePlotSystem(){
     double min3 = *std::min_element(y.constBegin(), y.constEnd());
     double max3 = *std::max_element(y.constBegin(), y.constEnd());
     // create graph and assign data to it:
-    ui->customplot_2->addGraph();
-    ui->customplot_2->graph(2)->setData(x, y);
-    ui->customplot_2->graph(2)->setPen(QPen(QColor(0, 0, 255)));
-    ui->customplot_2->graph(2)->setName("Z");
+    ui->widget_4->addGraph();
+    ui->widget_4->graph(2)->setData(x, y);
+    ui->widget_4->graph(2)->setPen(QPen(QColor(0, 0, 255)));
+    ui->widget_4->graph(2)->setName("Z");
     // give the axes some labels:
-    ui->customplot_2->xAxis->setLabel("t");
-    ui->customplot_2->yAxis->setLabel("P");
+    ui->widget_4->xAxis->setLabel("t");
+    ui->widget_4->yAxis->setLabel("P");
     // set axes ranges, so we see all data:
-    ui->customplot_2->xAxis->setRange(0, y.size());
+    ui->widget_4->xAxis->setRange(0, y.size());
 
-    ui->customplot_2->yAxis->setRange(std::min(std::min(min1,min2),min3), std::max(std::max(max1,max2),max3));
-    title = new QCPTextElement(ui->customplot_2, "System Parameters", QFont("sans", 10, QFont::Bold));
-    ui->customplot_2->plotLayout()->addElement(1, 0, title);
-    ui->customplot_2->replot();
+    ui->widget_4->yAxis->setRange(std::min(std::min(min1,min2),min3), std::max(std::max(max1,max2),max3));
+    title = new QCPTextElement(ui->widget_4, "System Parameters", QFont("sans", 10, QFont::Bold));
+    ui->widget_4->plotLayout()->addElement(1, 0, title);
+    ui->widget_4->replot();
 }
 
 void MainWindow::readSerial()
@@ -356,7 +367,7 @@ void MainWindow::readSerial()
         parsed_data2 = buffer_split[1];
         data.push_back(parsed_data1.toDouble());
         data.push_back(parsed_data2.toDouble());
-        //qDebug() << parsed_data1.toDouble() << parsed_data2.toDouble() << "\n";
+        qDebug() << parsed_data1.toDouble() << parsed_data2.toDouble() << "\n";
     }
     makePlotMeasurement();
     makePlotSystem();
@@ -367,10 +378,13 @@ void MainWindow::doCapture()
     QImage image = pv->cap.capture();
     int w = image.width();
     int h = image.height();
+    float l = 1.8;
+    image = image.scaled((int)(w/l), (int)(h/l));
+    image = image.mirrored(true, false);
     if (w > 0 && h > 0) {
         //setFixedSize(w, h);
-        ui->imagewidget->setFixedSize(w, h);
-        ui->imagewidget->setImage(image);
+        ui->widget_1->setFixedSize((int)(w/l), (int)(h/l));
+        ui->widget_1->setImage(image);
     }
 }
 
@@ -379,12 +393,12 @@ void MainWindow::on_action_file_save_as_triggered()
     QString path = QFileDialog::getSaveFileName(this, tr("Save as"), QString(), "JPEG files (*.jpg);;PNG files (*.png)");
     if (path.isEmpty()) return;
 
-    QImage image = ui->imagewidget->getImage();
+    QImage image = ui->widget_1->getImage();
     image.save(path);
 }
 
 void MainWindow::on_action_edit_copy_triggered()
 {
-    QImage image = ui->imagewidget->getImage();
+    QImage image = ui->widget_1->getImage();
     qApp->clipboard()->setImage(image);
 }

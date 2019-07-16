@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets printsupport serialport
+QT       += core gui widgets printsupport serialport webengine webenginewidgets
 
 TARGET = gstation
 TEMPLATE = app
@@ -34,7 +34,10 @@ HEADERS += \
     ImageWidget.h
 
 FORMS += \
-        mainwindow.ui
+    mainwindow.ui
+
+RESOURCES += \
+    resources.qrc
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -42,3 +45,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 unix:LIBS += -L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_shape -lopencv_videoio
+
+RESOURCES += \
+    resources.qrc
+
+DISTFILES +=
