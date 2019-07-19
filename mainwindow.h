@@ -5,6 +5,11 @@
 #include <QSerialPort>
 #include <QSerialPortInfo>
 #include <cstdlib>
+#include <QtWebEngineWidgets/QWebEngineView>
+#include <QtWebEngineWidgets/QWebEnginePage>
+#include <QtWebEngineWidgets/QWebEngineSettings>
+#include <QLayout>
+
 
 namespace Ui {
 class MainWindow;
@@ -23,6 +28,7 @@ private slots:
     void makePlotSystem();
     void readSerial();
     void doCapture();
+    void doMap();
     void on_action_file_save_as_triggered();
     void on_action_edit_copy_triggered();
 
@@ -38,6 +44,8 @@ private:
     QString parsed_data1;
     QString parsed_data2;
     QVector<double> data;
+    QWebEngineView* webview;
+    QVBoxLayout* layout;
 
 };
 

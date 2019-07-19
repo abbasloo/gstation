@@ -7,9 +7,7 @@
 #include <QClipboard>
 #include "opencv2/opencv.hpp"
 #include <algorithm>
-#include <QtWebEngineWidgets/QWebEngineView>
-#include <QtWebEngineWidgets/QWebEnginePage>
-#include <QtWebEngineWidgets/QWebEngineSettings>
+
 
 
 
@@ -124,14 +122,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     //setFixedSize(2000, 800);
 
-    QWebEngineView* webview = new QWebEngineView;
-    QUrl url = QUrl("qrc:/map.html");
-    webview->page()->load(url);
-    ui->widget_3->addWidget(webview);
-
     pv->cap.open();
 
+    webview = new QWebEngineView;
+    layout = new QVBoxLayout;
+    layout->addWidget(webview);
+    ui->widget_3->setLayout(layout);
+    QUrl url = QUrl("qrc:/map.html");
+    webview->page()->load(url);
+
     connect(&pv->timer, SIGNAL(timeout()), this, SLOT(doCapture()));
+    connect(&pv->timer, SIGNAL(timeout()), this, SLOT(doMap()));
     pv->timer.setInterval(0);
     pv->timer.start();
 
@@ -164,6 +165,7 @@ MainWindow::MainWindow(QWidget *parent) :
         qDebug() << "Couldn't find the correct port for the arduino.\n";
         QMessageBox::information(this, "Serial Port Error", "Couldn't open serial port to arduino.");
     }
+
     readSerial();
     makePlotMeasurement();
     makePlotSystem();
@@ -376,16 +378,26 @@ void MainWindow::readSerial()
 void MainWindow::doCapture()
 {
     QImage image = pv->cap.capture();
-    int w = image.width();
-    int h = image.height();
-    float l = 1.8;
-    image = image.scaled((int)(w/l), (int)(h/l));
+    //int w = image.width();
+    //int h = image.height();
+    //float l = 1.8;
+    //image = image.scaled((int)(w/l), (int)(h/l));
+    //image = image.mirrored(true, false);
+
+    int w = ui->widget_2->width();
+    int h = ui->widget_2->height();
+    image = image.scaled(w-5, h-5);
     image = image.mirrored(true, false);
     if (w > 0 && h > 0) {
-        //setFixedSize(w, h);
-        ui->widget_1->setFixedSize((int)(w/l), (int)(h/l));
         ui->widget_1->setImage(image);
     }
+}
+
+void MainWindow::doMap()
+{
+    int w = ui->widget_2->width();
+    int h = ui->widget_2->height();
+    ui->widget_3->setFixedSize(w-1, h-1);
 }
 
 void MainWindow::on_action_file_save_as_triggered()
