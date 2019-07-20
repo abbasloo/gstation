@@ -15,6 +15,8 @@ TEMPLATE = app
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
+target_link_libraries(${TARGET} NemaTode::NemaTode)
+
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
@@ -26,18 +28,18 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
     qcustomplot.cpp \
-    ImageWidget.cpp
+    ImageWidget.cpp \
 
 HEADERS += \
         mainwindow.h \
     qcustomplot.h \
-    ImageWidget.h
+    ImageWidget.h \
 
 FORMS += \
     mainwindow.ui
 
 RESOURCES += \
-    resources.qrc
+    resources.qrc \
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
@@ -48,5 +50,3 @@ unix:LIBS += -L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_shape -lop
 
 RESOURCES += \
     resources.qrc
-
-DISTFILES +=

@@ -7,7 +7,9 @@
 #include <QClipboard>
 #include "opencv2/opencv.hpp"
 #include <algorithm>
-
+//#include <QNmeaPositionInfoSource>
+#include <fstream>
+#include <iomanip>
 
 
 
@@ -131,6 +133,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QUrl url = QUrl("qrc:/map.html");
     webview->page()->load(url);
 
+    QImage *image = new QImage(":/logo.png", "PNG");
+    ui->widget_6->setFixedSize(140, 100);
+    *image = image->scaled(140, 100);
+    ui->widget_6->setImage(*image);
+
+    //ui->gridLayout_6->setMargin(10);
+
     connect(&pv->timer, SIGNAL(timeout()), this, SLOT(doCapture()));
     connect(&pv->timer, SIGNAL(timeout()), this, SLOT(doMap()));
     pv->timer.setInterval(0);
@@ -169,6 +178,7 @@ MainWindow::MainWindow(QWidget *parent) :
     readSerial();
     makePlotMeasurement();
     makePlotSystem();
+    doGPS();
 }
 
 MainWindow::~MainWindow()
@@ -407,6 +417,10 @@ void MainWindow::on_action_file_save_as_triggered()
 
     QImage image = ui->widget_1->getImage();
     image.save(path);
+}
+
+void MainWindow::doGPS(){
+
 }
 
 void MainWindow::on_action_edit_copy_triggered()

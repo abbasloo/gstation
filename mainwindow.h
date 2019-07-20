@@ -29,6 +29,7 @@ private slots:
     void readSerial();
     void doCapture();
     void doMap();
+    void doGPS();
     void on_action_file_save_as_triggered();
     void on_action_edit_copy_triggered();
 
