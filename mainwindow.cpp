@@ -4,12 +4,20 @@
 #include <QDebug>
 #include <QTimer>
 #include <QFileDialog>
+#include <qfileinfo.h>
 #include <QClipboard>
 #include "opencv2/opencv.hpp"
 #include <algorithm>
-//#include <QNmeaPositionInfoSource>
+#include "NMEAParserLib/NMEAParser.h"
 #include <fstream>
 #include <iomanip>
+#include "websocketclientwrapper.h"
+#include "websockettransport.h"
+#include <QDir>
+#include <QFileInfo>
+#include <QUrl>
+#include <QWebChannel>
+#include <QWebSocketServer>
 
 
 
@@ -24,6 +32,67 @@
 #endif
 
 # define M_PI           3.14159265358979323846  /* pi */
+
+#include <stdio.h>
+#include <string.h>
+
+///
+/// \class MyParser
+/// \brief child class of CNMEAParser which will redefine notification calls from the parent class.
+///
+class MyNMEAParser : public CNMEAParser {
+
+    ///
+    /// \brief This method is called whenever there is a parsing error.
+    ///
+    /// Redefine this method to capture errors.
+    ///
+    /// \param pCmd Pointer to NMEA command that caused the error. Please note that this parameter may be NULL of not completely defined. Use with caution.
+    ///
+    virtual void OnError(CNMEAParserData::ERROR_E nError, char *pCmd) {
+        printf("ERROR for Cmd: %s, Number: %d\n", pCmd, nError);
+    }
+
+protected:
+    ///
+    /// \brief This method is redefined from CNMEAParserPacket::ProcessRxCommand(char *pCmd, char *pData)
+    ///
+    /// Here we are capturing the ProcessRxCommand to print out status. We also are looking for
+    /// the GPGGA message and displaying some data from it.
+    ///
+    /// \param pCmd Pointer to the NMEA command string
+    /// \param pData Comma separated data that belongs to the command
+    /// \return Returns CNMEAParserData::ERROR_OK If successful
+    ///
+    virtual CNMEAParserData::ERROR_E ProcessRxCommand(char *pCmd, char *pData) {
+
+        // Call base class to process the command
+        CNMEAParser::ProcessRxCommand(pCmd, pData);
+
+        printf("Cmd: %s\nData: %s\n", pCmd, pData);
+
+        // Check if this is the GPGGA command. If it is, then display some data
+        if (strstr(pCmd, "GPGGA") != NULL) {
+            CNMEAParserData::GGA_DATA_T ggaData;
+            if (GetGPGGA(ggaData) == CNMEAParserData::ERROR_OK) {
+                printf("GPGGA Parsed!\n");
+                printf("   Time:                %02d:%02d:%02d\n", ggaData.m_nHour, ggaData.m_nMinute, ggaData.m_nSecond);
+                printf("   Latitude:            %f\n", ggaData.m_dLatitude);
+                printf("   Longitude:           %f\n", ggaData.m_dLongitude);
+                printf("   Altitude:            %.01fM\n", ggaData.m_dAltitudeMSL);
+                printf("   GPS Quality:         %d\n", ggaData.m_nGPSQuality);
+                printf("   Satellites in view:  %d\n", ggaData.m_nSatsInView);
+                printf("   HDOP:                %.02f\n", ggaData.m_dHDOP);
+                printf("   Differential ID:     %d\n", ggaData.m_nDifferentialID);
+                printf("   Differential age:    %f\n", ggaData.m_dDifferentialAge);
+                printf("   Geoidal Separation:  %f\n", ggaData.m_dGeoidalSep);
+                printf("   Vertical Speed:      %.02f\n", ggaData.m_dVertSpeed);
+            }
+        }
+
+        return CNMEAParserData::ERROR_OK;
+    }
+};
 
 // solution 1: use cv::VideoCapture
 class Capture1 {
@@ -126,6 +195,22 @@ MainWindow::MainWindow(QWidget *parent) :
 
     pv->cap.open();
 
+    QFileInfo jsFileInfo(QDir::currentPath() + "/qwebchannel.js");
+
+    if (!jsFileInfo.exists())
+        QFile::copy(":/qtwebchannel/qwebchannel.js",jsFileInfo.absoluteFilePath());
+
+     // setup the QWebSocketServer
+     QWebSocketServer server(QStringLiteral("QWebChannel Standalone Example Server"), QWebSocketServer::NonSecureMode);
+
+     // wrap WebSocket clients in QWebChannelAbstractTransport objects
+     WebSocketClientWrapper clientWrapper(&server);
+
+     // setup the channel
+     QWebChannel channel;
+     QObject::connect(&clientWrapper, &WebSocketClientWrapper::clientConnected,
+                      &channel, &QWebChannel::connectTo);
+
     webview = new QWebEngineView;
     layout = new QVBoxLayout;
     layout->addWidget(webview);
@@ -133,10 +218,15 @@ MainWindow::MainWindow(QWidget *parent) :
     QUrl url = QUrl("qrc:/map.html");
     webview->page()->load(url);
 
-    QImage *image = new QImage(":/logo.png", "PNG");
+    QImage *image = new QImage(":/logo2.png", "PNG");
     ui->widget_6->setFixedSize(140, 100);
     *image = image->scaled(140, 100);
     ui->widget_6->setImage(*image);
+
+    QImage *imagee = new QImage(":/logo1.png", "PNG");
+    ui->widget_5->setFixedSize(200,100);
+    *imagee = imagee->scaled(200, 40);
+    ui->widget_5->setImage(*imagee);
 
     //ui->gridLayout_6->setMargin(10);
 
@@ -420,7 +510,13 @@ void MainWindow::on_action_file_save_as_triggered()
 }
 
 void MainWindow::doGPS(){
-
+    CNMEAParserData::GGA_DATA_T gpggaData;
+    MyNMEAParser	NMEAParser;
+    NMEAParser.ResetData();
+    const char * szGGASample = "$GPGGA,145416.00,3350.10959,N,11751.22870,W,1,09,0.85,70.3,M,-32.7,M,,*5B";
+    NMEAParser.ProcessNMEABuffer((char *)szGGASample, (int)strlen(szGGASample));
+    NMEAParser.GetGPGGA(gpggaData);
+    std::cout<<gpggaData.m_dLatitude<<std::endl;
 }
 
 void MainWindow::on_action_edit_copy_triggered()

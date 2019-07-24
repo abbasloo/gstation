@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>map.html</file>
-        <file>logo.png</file>
+        <file>logo1.png</file>
+        <file>logo2.png</file>
     </qresource>
 </RCC>

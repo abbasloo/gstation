@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui widgets printsupport serialport webengine webenginewidgets
+QT       += core gui widgets printsupport serialport webengine webenginewidgets webchannel websockets
 
 TARGET = gstation
 TEMPLATE = app
@@ -14,8 +14,6 @@ TEMPLATE = app
 # depend on your compiler). Please consult the documentation of the
 # deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-
-target_link_libraries(${TARGET} NemaTode::NemaTode)
 
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -29,11 +27,30 @@ SOURCES += \
         mainwindow.cpp \
     qcustomplot.cpp \
     ImageWidget.cpp \
+    NMEAParserLib/NMEASentenceRMC.cpp \
+    NMEAParserLib/NMEASentenceGSV.cpp \
+    NMEAParserLib/NMEASentenceGSA.cpp \
+    NMEAParserLib/NMEASentenceGGA.cpp \
+    NMEAParserLib/NMEASentenceBase.cpp \
+    NMEAParserLib/NMEAParserPacket.cpp \
+    NMEAParserLib/NMEAParser.cpp \
+    websockettransport.cpp \
+    websocketclientwrapper.cpp
 
 HEADERS += \
         mainwindow.h \
     qcustomplot.h \
     ImageWidget.h \
+    NMEAParserLib/NMEASentenceRMC.h \
+    NMEAParserLib/NMEASentenceGSV.h \
+    NMEAParserLib/NMEASentenceGSA.h \
+    NMEAParserLib/NMEASentenceGGA.h \
+    NMEAParserLib/NMEASentenceBase.h \
+    NMEAParserLib/NMEAParserPacket.h \
+    NMEAParserLib/NMEAParserData.h \
+    NMEAParserLib/NMEAParser.h \
+    websockettransport.h \
+    websocketclientwrapper.h
 
 FORMS += \
     mainwindow.ui
@@ -50,3 +67,6 @@ unix:LIBS += -L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_shape -lop
 
 RESOURCES += \
     resources.qrc
+
+DISTFILES += \
+    qwebchannel.js
